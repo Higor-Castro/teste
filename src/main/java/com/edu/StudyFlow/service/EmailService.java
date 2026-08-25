@@ -1,39 +1,53 @@
 package com.edu.StudyFlow.service;
 
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-/*
- * Service tem o papel de concentrar
- * a logica da aplicacao, onde o foco dessa classe e o envio de email.
- *
- * @Service indica que esta classe contem
- * a logica de negocio da aplicacao.
- */
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class EmailService {
-    private final JavaMailSender mailSender;
-    // Injecao do mailSender via construtor
-    public  EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+
+    @Value("${brevo.api-key}")
+    private String apiKey;
+
+    @Value("${brevo.email}")
+    private String emailRemetente;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public void enviarEmail(String destinatario, String corpo) {
+
+        String url = "https://api.brevo.com/v3/smtp/email";
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("api-key", apiKey);
+
+        Map<String, Object> remetente = new HashMap<>();
+        remetente.put("email", emailRemetente);
+        remetente.put("name", "StudyFlow");
+
+        Map<String, Object> destinatarioMap = new HashMap<>();
+        destinatarioMap.put("email", destinatario);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("sender", remetente);
+        body.put("to", new Map[]{destinatarioMap});
+        body.put("subject", "StudyFlow");
+        body.put("textContent", corpo);
+
+        HttpEntity<Map<String, Object>> request =
+                new HttpEntity<>(body, headers);
+
+        restTemplate.postForEntity(
+                url,
+                request,
+                String.class
+        );
     }
-    // Envia o email com base no email e o texto fornecido via parametro
-    public void enviarEmail (String destinatario, String corpo){
-        // Cria o objeto que representa o e-mail.
-        SimpleMailMessage message = new SimpleMailMessage();
-
-        // Define o destinatario.
-        message.setTo(destinatario);
-
-        // Define o assunto.
-        message.setSubject("StudyFlow");
-
-        // Define o conteudo.
-        message.setText(corpo);
-
-        // Envia o e-mail.
-        mailSender.send(message);
-
-
-    }}
+}
