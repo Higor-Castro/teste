@@ -33,3 +33,5 @@ build/
 .vscode/
 
 
+### Aplication ###
+src/main/resources/teste.env
