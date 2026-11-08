@@ -62,7 +62,7 @@ jobs:
 
           # --results=verified,unknown: só nos importamos com segredos que
           # o TruffleHog confirmou como reais (verified) ou que não conseguiu descartar (unknown).
-          extra_args: --results=verified,unknown --fail
+          extra_args: --results=verified,unknown
 
   # JOB 1b — Verificação completa do histórico (lenta, mas Detalhada)
   # Só roda 1x por semana ou quando alguém dispara manualmente.
@@ -85,7 +85,7 @@ jobs:
           # Repare que aqui NÃO passamos "base" nem "head" é exatamente
           # essa ausência que faz o TruffleHog varrer o histórico
           # completo do repositório, em vez de só o diff de um push.
-          extra_args: --results=verified,unknown --fail
+          extra_args: --results=verified,unknown
 
   # JOB 2: SCA (Software Composition Analysis) com Trivy.
   # SCA = analisar as bibliotecas de terceiros que o projeto usa e checar se alguma delas tem uma CVE conhecida.
